@@ -1,5 +1,3 @@
-from products import Product
-
 
 class Store:
     """A class representing a store that manages multiple products."""
