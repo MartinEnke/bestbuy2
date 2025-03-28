@@ -1,6 +1,5 @@
-from products import Product
+from products import Product, NonStockedProduct, LimitedProduct
 from store import Store
-
 
 def start(store):
     """
@@ -48,7 +47,10 @@ def start(store):
                     print("Product not found. Try again.")
                 else:
                     quantity = int(quantity)
-                    if quantity > product.get_quantity():
+                    if isinstance(product, LimitedProduct) and quantity > product.max_order_quantity:
+                        print(f"Sorry, you can only order up to {product.max_order_quantity} of {product.name}.")
+                        continue
+                    elif quantity > product.get_quantity():
                         print(f"Sorry, you cannot order more than {product.get_quantity()} of {product.name}.")
                         continue
                     shopping_list.append((product, quantity))
@@ -73,7 +75,9 @@ def main():
     product_list = [
         Product("MacBook Air M2", price=1450, quantity=100),
         Product("Bose QuietComfort Earbuds", price=250, quantity=500),
-        Product("Google Pixel 7", price=500, quantity=250)
+        Product("Google Pixel 7", price=500, quantity=250),
+        NonStockedProduct("Microsoft Windows License", price=150),
+        LimitedProduct("Shipping Fee", price=10, quantity=100, max_order_quantity=1)
     ]
     best_buy = Store(product_list)
 

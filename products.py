@@ -13,6 +13,7 @@ class Product:
         self.quantity = quantity
         self.active = True
 
+
     def get_quantity(self) -> int:
         """
         Returns the current quantity of the product in stock.
@@ -65,3 +66,36 @@ class Product:
         total_price = quantity * self.price
         self.set_quantity(self.quantity - quantity)
         return total_price
+
+
+class NonStockedProduct(Product):
+    def __init__(self, name: str, price: float):
+        # Non-stocked products always have quantity 0
+        super().__init__(name, price, quantity=0)
+
+    def show(self) -> str:
+        """
+        Override the show method to reflect that this product is non-stocked.
+        """
+        return f"{self.name}, Price: {self.price}, Non-stocked (Quantity: {self.quantity})"
+
+
+class LimitedProduct(Product):
+    def __init__(self, name: str, price: float, quantity: int, max_order_quantity: int):
+        super().__init__(name, price, quantity)
+        self.max_order_quantity = max_order_quantity
+
+    def buy(self, quantity: int) -> float:
+        """
+        Override the buy method to limit the quantity that can be purchased.
+        If quantity exceeds max_order_quantity, an exception will be raised.
+        """
+        if quantity > self.max_order_quantity:
+            raise ValueError(f"You can only purchase up to {self.max_order_quantity} of this item.")
+        return super().buy(quantity)
+
+    def show(self) -> str:
+        """
+        Override the show method to indicate that this product has a purchase limit.
+        """
+        return f"{self.name}, Price: {self.price}, Quantity: {self.quantity}, Max order quantity: {self.max_order_quantity}"
