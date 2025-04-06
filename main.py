@@ -6,13 +6,13 @@ def start(store):
     Starts the user interface for interacting with the store.
     """
     while True:
-        print("\nWelcome to the Store!")
+        print("\n   Store Menu")
+        print("   ----------")
         print("1. List all products in store")
         print("2. Show total amount in store")
         print("3. Make an order")
         print("4. Quit")
-
-        choice = input("Choose an option (1-4): ").strip()
+        choice = input("Please choose a number: ").strip()
 
         if choice == "1":
             # List all products
@@ -28,32 +28,44 @@ def start(store):
             total_quantity = store.get_total_quantity()
             print(f"Total quantity in store: {total_quantity}")
 
+
         elif choice == "3":
             # Make an order
             products = store.get_all_products()
+            print("\nAvailable Products:")
+            index = 1
+            for product in products:
+                print(f"{index}. {product.name} (Quantity: {product.get_quantity()})")
+                index += 1
+
             shopping_list = []
-            print("Enter the product and quantity you'd like to order:")
+            print("When you want to finish order, enter empty text")
             while True:
-                product_name = input("Enter product name (or 'done' to finish): ").strip()
-                if product_name.lower() == "done":
+                selection = input("Which product # do you want? ").strip()
+                if selection == "":
                     break
-                quantity = input(f"Enter quantity for {product_name}: ").strip()
+                if not selection.isdigit():
+                    print("Invalid input. Please enter a number.")
+                    continue
+
+                selection = int(selection)
+                if selection < 1 or selection > len(products):
+                    print("Invalid product number. Try again.")
+                    continue
+
+                product = products[selection - 1]
+                quantity = input(f"What amount do you want? ").strip()
+
                 if not quantity.isdigit() or int(quantity) <= 0:
                     print("Please enter a valid quantity.")
                     continue
 
-                product = next((p for p in products if p.name.lower() == product_name.lower()), None)
-                if not product:
-                    print("Product not found. Try again.")
-                else:
-                    quantity = int(quantity)
-                    if isinstance(product, LimitedProduct) and quantity > product.max_order_quantity:
-                        print(f"Sorry, you can only order up to {product.max_order_quantity} of {product.name}.")
-                        continue
-                    elif quantity > product.get_quantity():
-                        print(f"Sorry, you cannot order more than {product.get_quantity()} of {product.name}.")
-                        continue
-                    shopping_list.append((product, quantity))
+                quantity = int(quantity)
+                if quantity > product.get_quantity():
+                    print(f"Sorry, you cannot order more than {product.get_quantity()} units.")
+                    continue
+                print("Product added to list!\n")
+                shopping_list.append((product, quantity))
 
             if shopping_list:
                 total_price = store.order(shopping_list)

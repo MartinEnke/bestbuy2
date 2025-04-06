@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 # Step 1: Create the abstract Promotion class
 class Promotion(ABC):
     def __init__(self, name: str):
@@ -8,6 +9,7 @@ class Promotion(ABC):
     @abstractmethod
     def apply_promotion(self, product, quantity: int) -> float:
         pass
+
 
 # Step 2: Create the specific promotion classes
 
@@ -42,6 +44,7 @@ class Buy2Get1FreePromotion(Promotion):
         total_price = total_items * product.price
         return total_price
 
+
 # Step 3: Update the Product class
 
 class Product:
@@ -52,7 +55,7 @@ class Product:
         self.name = name
         self.price = price
         self.quantity = quantity
-        self.active = True
+        self.active = quantity > 0
         self.promotion = None  # Add promotion instance variable
 
     def get_quantity(self) -> int:
