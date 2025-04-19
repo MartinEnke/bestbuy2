@@ -1,7 +1,6 @@
 import pytest
 from products import Product
 
-
 def test_create_product():
     """Test that a product can be created successfully."""
     product = Product("Laptop", 1000.0, 5)
