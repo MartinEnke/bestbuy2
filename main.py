@@ -3,7 +3,15 @@ from store import Store
 
 def start(store):
     """
-    Starts the user interface for interacting with the store.
+    Starts the interactive CLI for the provided store.
+
+    Prints a menu of actions:
+      1. List all active products
+      2. Show total quantity of products
+      3. Make an order by selecting products and quantities
+      4. Quit the application
+
+    Prompts the user for input and performs the corresponding action until the user chooses to quit.
     """
     while True:
         print("\n   Store Menu")
@@ -15,7 +23,7 @@ def start(store):
         choice = input("Please choose a number: ").strip()
 
         if choice == "1":
-            # List all products
+            # List all active products
             products = store.get_all_products()
             if not products:
                 print("No active products available.")
@@ -24,13 +32,16 @@ def start(store):
                     print(product.show())
 
         elif choice == "2":
-            # Show total quantity in store
+            # Show total quantity of all products
             total_quantity = store.get_total_quantity()
             print(f"Total quantity in store: {total_quantity}")
 
-
         elif choice == "3":
-            # Make an order
+            """
+            Allows the user to create an order by selecting products by index and specifying quantities.
+            Validates inputs and ensures stock limits are respected.
+            Calculates and prints the total order cost.
+            """
             products = store.get_all_products()
             print("\nAvailable Products:")
             index = 1
@@ -83,13 +94,16 @@ def start(store):
 
 
 def main():
+    """
+    Initializes the store with a set of products and launches the CLI.
+    """
     # Setup initial stock of inventory
     product_list = [
         Product("MacBook Air M2", price=1450, quantity=100),
         Product("Bose QuietComfort Earbuds", price=250, quantity=500),
         Product("Google Pixel 7", price=500, quantity=250),
         NonStockedProduct("Microsoft Windows License", price=150),
-        LimitedProduct("Shipping Fee", price=10, quantity=100, max_order_quantity=1)
+        LimitedProduct("Shipping Fee", price=10, quantity=100, maximum=1)
     ]
     best_buy = Store(product_list)
 

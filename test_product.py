@@ -1,5 +1,10 @@
+"""
+Unit tests for the Products class in products.py.
+"""
+
 import pytest
 from products import Product
+
 
 def test_create_product():
     """Test that a product can be created successfully."""
@@ -46,10 +51,6 @@ def test_buy():
 
     with pytest.raises(ValueError):
         product.buy(20)
-
-
-import pytest
-from products import Product
 
 
 # Test 1: When a product reaches 0 quantity, it becomes inactive
