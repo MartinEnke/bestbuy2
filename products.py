@@ -75,11 +75,14 @@ class Product:
         if quantity > self.quantity:
             raise ValueError("Not enough stock available.")
 
-        total_price = (
-            self.promotion.apply_promotion(self, quantity)
-            if self.promotion else quantity * self.price
-        )
+        # Calculate price using promotion if available, otherwise standard price * qty
+        if self.promotion is not None:
+            total_price = self.promotion.apply_promotion(self, quantity)
+        else:
+            total_price = self.price * quantity
 
+
+            # Deduct stock
         self.set_quantity(self.quantity - quantity)
         return total_price
 
@@ -89,29 +92,43 @@ class NonStockedProduct(Product):
     Represents a product without inventory tracking (infinite availability).
     """
     def __init__(self, name: str, price: float):
-        """
-        Initializes a non-stocked product with zero quantity.
-        """
         super().__init__(name, price, quantity=0)
 
+    def get_quantity(self) -> int:
+        """
+        Overrides stock check—always “infinite” (we’ll treat as 0 but never out-of-stock).
+        """
+        return float('inf')
+
+    def is_active(self) -> bool:
+        return True
+
     def show(self) -> str:
+        return f"{self.name}, Price: {self.price}, Non-stocked"
+
+    def buy(self, quantity: int) -> float:
         """
-        Returns a string representation indicating non-stock status.
+        Always available—just calculate price (with promotion if any) without changing stock.
         """
-        return f"{self.name}, Price: {self.price}, Non-stocked (Quantity: {self.quantity})"
+        if quantity <= 0:
+            raise ValueError("Quantity must be greater than zero.")
+
+        if self.promotion:
+            return self.promotion.apply_promotion(self, quantity)
+        return self.price * quantity
 
 
 class LimitedProduct(Product):
     """
     Represents a product with a maximum allowable purchase limit per order.
     """
-    def __init__(
-        self, name: str, price: float, quantity: int, maximum: int
-    ):
+    def __init__(self, name: str, price: float, quantity: int, maximum: int):
         """
         Initializes a limited product with a purchase cap.
         """
         super().__init__(name, price, quantity)
+        if maximum <= 0:
+            raise ValueError("Maximum must be greater than zero.")
         self.maximum = maximum
 
     def buy(self, quantity: int) -> float:

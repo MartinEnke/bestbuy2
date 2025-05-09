@@ -19,6 +19,22 @@ class Promotion(ABC):
         """
         pass
 
+    def apply(self, shopping_list, full_price: float) -> float:
+        """
+        Applies this promotion across the full shopping_list.
+
+        Default implementation:
+          - For each (product, qty) in shopping_list, call apply_promotion.
+          - Sum those line totals and return.
+
+        Promotions that need to look at the entire basket (e.g. bundle deals)
+        can override this method.
+        """
+        discounted_total = 0.0
+        for product, qty in shopping_list:
+            discounted_total += self.apply_promotion(product, qty)
+        return discounted_total
+
 
 class PercentDiscount(Promotion):
     """
@@ -104,12 +120,6 @@ class SecondItemHalfPricePromotion(SecondHalfPrice):
 
     def __init__(self, name: str):
         super().__init__(name)
-
-    def apply_promotion(self, product, quantity: int) -> float:
-        """
-        Overrides just to maintain signature, delegates to SecondHalfPrice logic.
-        """
-        return super().apply_promotion(product, quantity)
 
 
 class Buy2Get1FreePromotion(ThirdOneFree):

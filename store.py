@@ -1,3 +1,5 @@
+from products import LimitedProduct
+
 
 class Store:
     """A class representing a store that manages multiple products."""
@@ -9,8 +11,16 @@ class Store:
         """
         if products is None:
             self.products = []
+            self.promotion = None
         else:
             self.products = products
+
+    def set_promotion(self, promotion):
+        """
+        Attaches a promotion strategy to the store.
+        The promotion must implement an `apply(order_list, full_price)` method.
+        """
+        self.promotion = promotion
 
     def add_product(self, product):
         """
@@ -46,13 +56,30 @@ class Store:
 
     def order(self, shopping_list):
         """
-        Processes an order by buying specified quantities of products.
+        Processes an order:
+          - Enforces per‑product caps for LimitedProduct
+          - Calls each product.buy(qty) exactly once
+          - Totals up the prices
         """
-        total_price = 0
+        # 1) Build a map of total requested per product
+        totals = {}
+        for product, qty in shopping_list:
+            totals.setdefault(product, 0)
+            totals[product] += qty
 
-        for item in shopping_list:
-            product, quantity = item
+        # 2) Enforce LimitedProduct maximums
+        for product, total_qty in totals.items():
+            if isinstance(product, LimitedProduct):
+                if total_qty > product.maximum:
+                    raise ValueError(
+                        f"You requested {total_qty} of {product.name}, "
+                        f"but the per-order maximum is {product.maximum}."
+                    )
+
+        # 3) Now actually buy once per line, summing price
+        total_price = 0
+        for product, qty in shopping_list:
             if product in self.products and product.is_active():
-                total_price += product.buy(quantity)
+                total_price += product.buy(qty)
 
         return total_price
